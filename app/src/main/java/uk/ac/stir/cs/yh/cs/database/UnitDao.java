@@ -17,4 +17,10 @@ public interface UnitDao {
 
     @Delete
     void delete(Unit unit);
+
+    @Query("SELECT * FROM unit WHERE category_id = :category_id")
+    List<Unit> getUnitsByCategory(int category_id);
+
+    @Query("SELECT * FROM unit WHERE unit_name = :unitName")
+    Unit getUnitByName(String unitName);
 }

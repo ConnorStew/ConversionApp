@@ -2,9 +2,11 @@ package uk.ac.stir.cs.yh.cs;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -12,34 +14,56 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import uk.ac.stir.cs.yh.cs.database.Category;
 import uk.ac.stir.cs.yh.cs.database.Database;
+import uk.ac.stir.cs.yh.cs.database.Unit;
 
 public class PickerFragment extends Fragment {
 
-    private View view;
+    private Spinner categorySpinner;
+    private Spinner fromSpinner;
+    private Spinner toSpinner;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.activity_picker, container, false);
+        List<Category> categories = new ArrayList<>(Database.getDB().categoryDao().getAll());
 
         final Context context = getContext();
+        View view = inflater.inflate(R.layout.activity_picker, container, false);
+        categorySpinner = view.findViewById(R.id.categorySpinner);
+        fromSpinner = view.findViewById(R.id.fromSpinner);
+        toSpinner = view.findViewById(R.id.toSpinner);
 
-        new Thread(() -> {
-            List<Category> categories = Database.getDB().categoryDao().getAll();
-            String[] categoryNames = new String[categories.size()];
-            for (int i = 0; i < categories.size(); i++)
-                categoryNames[i] = categories.get(i).categoryName;
+        setSpinnerItems(categorySpinner, categories, context);
 
-            Spinner categorySpinner = view.findViewById(R.id.categorySpinner);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, categoryNames);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        fromSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("Click", "from spinner selected");
+                Unit fromSelected = (Unit) fromSpinner.getSelectedItem();
+                List<Unit> units = getUnitsFromSelectedCategory();
+                units.remove(fromSelected);
+                setSpinnerItems(toSpinner, units, context);
+            }
 
-            categorySpinner.setAdapter(adapter);
-        }).start();
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("Click", "category selected");
+                setSpinnerItems(fromSpinner, getUnitsFromSelectedCategory(), context);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         return view;
     }
@@ -47,5 +71,17 @@ public class PickerFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    private List<Unit> getUnitsFromSelectedCategory() {
+        Category selectedCategory = (Category) categorySpinner.getSelectedItem();
+        return Database.getDB().unitDao().getUnitsByCategory(selectedCategory.id);
+    }
+
+    private void setSpinnerItems(Spinner spinner, List<?> values, Context context) {
+        ArrayAdapter<?> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, values);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(adapter);
     }
 }

@@ -13,7 +13,7 @@ public class Database {
     private Database() {}
 
     public static void initDB(Context context) {
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).build();
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).allowMainThreadQueries().build();
         initTestData();
     }
 
@@ -32,16 +32,27 @@ public class Database {
             Log.d("Categories", category.toString());
 
         int weightID = db.categoryDao().getCategoryByName("Weight").id;
+        int liquidID = db.categoryDao().getCategoryByName("Liquid").id;
         db.unitDao().insertAll(
                 new Unit("Kilogram", "kg", weightID),
-                new Unit("Pound", "lb", weightID)
+                new Unit("Pound", "lb", weightID),
+                new Unit("Gallon", "gallon", liquidID),
+                new Unit("Pint", "pint", liquidID),
+                new Unit("Quart", "quart", liquidID)
         );
 
         for (Unit unit : db.unitDao().getAll())
             Log.d("Units", unit.toString());
 
+        int kilogramID = db.unitDao().getUnitByName("Kilogram").id;
+        int poundID = db.unitDao().getUnitByName("Pound").id;
+        int gallonID = db.unitDao().getUnitByName("Gallon").id;
+        int pintID = db.unitDao().getUnitByName("Pint").id;
+        int quartID = db.unitDao().getUnitByName("Quart").id;
         db.conversionDao().insertAll(
-                new Conversion(0, 1, 2.2)
+                new Conversion(kilogramID, poundID, 2.2),
+                new Conversion(gallonID, pintID, 8),
+                new Conversion(gallonID, quartID, 4)
         );
 
         for (Conversion conversion : db.conversionDao().getAll())

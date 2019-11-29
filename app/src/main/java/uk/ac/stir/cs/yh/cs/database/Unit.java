@@ -1,5 +1,6 @@
 package uk.ac.stir.cs.yh.cs.database;
 
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -32,11 +33,20 @@ public class Unit {
 
     @Override
     public String toString() {
-        return "Unit{" +
-                "id=" + id +
-                ", unitName='" + unitName + '\'' +
-                ", unitSuffix='" + unitSuffix + '\'' +
-                ", categoryId=" + categoryId +
-                '}';
+        return unitName;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        boolean equal = false;
+        if (obj instanceof Unit) {
+            Unit otherUnit = (Unit) obj;
+
+            if (otherUnit.unitName.equals(this.unitName)) {
+                equal = true;
+            }
+        }
+
+        return equal;
     }
 }
