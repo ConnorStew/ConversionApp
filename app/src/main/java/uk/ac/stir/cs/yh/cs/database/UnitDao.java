@@ -9,14 +9,9 @@ import java.util.List;
 
 @Dao
 public interface UnitDao {
-    @Query("SELECT * FROM unit")
-    List<Unit> getAll();
 
     @Insert
     void insertAll(Unit... units);
-
-    @Delete
-    void delete(Unit unit);
 
     @Query("SELECT * FROM unit WHERE category_id = :category_id")
     List<Unit> getUnitsByCategory(int category_id);

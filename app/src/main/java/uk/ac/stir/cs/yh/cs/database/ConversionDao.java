@@ -7,14 +7,24 @@ import androidx.room.Query;
 
 import java.util.List;
 
+/**
+ * This interface allows the app to access conversions from the database.
+ * @author Connor Stewart
+ */
 @Dao
 public interface ConversionDao {
+
+    /**
+     * Gets all conversions in the database.
+     * @return all conversions in the database
+     */
     @Query("SELECT * FROM conversion")
     List<Conversion> getAll();
 
+    /**
+     * Inserts given conversions into the database.
+     * @param conversions the conversions to insert
+     */
     @Insert
     void insertAll(Conversion... conversions);
-
-    @Delete
-    void delete(Conversion conversion);
 }

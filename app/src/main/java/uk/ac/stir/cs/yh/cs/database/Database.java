@@ -1,35 +1,43 @@
 package uk.ac.stir.cs.yh.cs.database;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.room.Room;
 
+/**
+ * This singleton class allows access to the Room database from other classes.
+ * @author Connor Stewart
+ */
 public class Database {
-    private static final Database ourInstance = new Database();
 
+    /** The instance of the Room database. */
     private static AppDatabase db;
 
+    /** Singleton class to the constructor is private. */
     private Database() {}
 
+    /**
+     * Creates the Room database and inserts test data.
+     * @param context the applications context
+     */
     public static void initDB(Context context) {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).allowMainThreadQueries().build();
         initTestData();
     }
 
+    /** @return the Room database */
     public static AppDatabase getDB() {
         return db;
     }
 
+    /** Inserts test data into the database. */
     private static void initTestData() {
         db.clearAllTables();
+
         db.categoryDao().insertAll(
                 new Category("Weight"),
                 new Category("Liquid")
         );
-
-        for (Category category : db.categoryDao().getAll())
-            Log.d("Categories", category.toString());
 
         int weightID = db.categoryDao().getCategoryByName("Weight").id;
         int liquidID = db.categoryDao().getCategoryByName("Liquid").id;
@@ -41,9 +49,6 @@ public class Database {
                 new Unit("Quart", "quart", liquidID)
         );
 
-        for (Unit unit : db.unitDao().getAll())
-            Log.d("Units", unit.toString());
-
         int kilogramID = db.unitDao().getUnitByName("Kilogram").id;
         int poundID = db.unitDao().getUnitByName("Pound").id;
         int gallonID = db.unitDao().getUnitByName("Gallon").id;
@@ -54,8 +59,5 @@ public class Database {
                 new Conversion(gallonID, pintID, 8),
                 new Conversion(gallonID, quartID, 4)
         );
-
-        for (Conversion conversion : db.conversionDao().getAll())
-            Log.d("Conversions", conversion.toString());
     }
 }
