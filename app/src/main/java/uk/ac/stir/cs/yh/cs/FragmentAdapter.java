@@ -5,20 +5,21 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-
 class FragmentAdapter extends FragmentStatePagerAdapter {
-    private final int mNumOfTabs;
 
-    public FragmentAdapter(FragmentManager fragmentManager, int numOfTabs) {
+    private final int numberOfFragments = 2;
+
+    FragmentAdapter(FragmentManager fragmentManager) {
         super(fragmentManager);
-        this.mNumOfTabs = numOfTabs;
     }
 
     @Override
-    public Fragment getItem(int position) {
-        switch (position) {
+    public Fragment getItem(int fragmentIndex) {
+        switch (fragmentIndex) {
             case 0:
                 return new PickerFragment();
+            case 1:
+                return new ConversionFragment();
             default:
                 return null;
         }
@@ -26,6 +27,6 @@ class FragmentAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return mNumOfTabs;
+        return numberOfFragments;
     }
 }

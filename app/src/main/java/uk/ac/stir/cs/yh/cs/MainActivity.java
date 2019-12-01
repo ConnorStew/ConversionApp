@@ -1,26 +1,29 @@
 package uk.ac.stir.cs.yh.cs;
 
+
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager.widget.ViewPager;
+
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import uk.ac.stir.cs.yh.cs.database.Database;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Database.initDB(this);
+
         setContentView(R.layout.activity_main);
 
-        ViewPager pager = findViewById(R.id.pager);
-        FragmentAdapter pagerAdapter = new FragmentAdapter(getSupportFragmentManager(), 1);
-        pager.setAdapter(pagerAdapter);
-
-        new Thread(() -> {
-            Database.initDB(this);
-            pager.setCurrentItem(0);
-        }).start();
+        PickerFragment newFragment = new PickerFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, newFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

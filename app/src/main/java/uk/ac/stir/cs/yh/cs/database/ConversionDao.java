@@ -27,4 +27,7 @@ public interface ConversionDao {
      */
     @Insert
     void insertAll(Conversion... conversions);
+
+    @Query("SELECT * FROM conversion WHERE unit_1_id = :unitOneId AND unit_2_id = :unitTwoId")
+    Conversion getConversion(int unitOneId, int unitTwoId);
 }

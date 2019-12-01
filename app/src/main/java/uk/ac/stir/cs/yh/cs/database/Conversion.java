@@ -29,7 +29,7 @@ public class Conversion {
 
     /** The amount to multiply the first Unit by to get the second Unit. */
     @ColumnInfo(name = "conversion_factor")
-    double conversionFactor;
+    public double conversionFactor;
 
     @Override
     @NonNull

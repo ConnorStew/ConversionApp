@@ -1,5 +1,8 @@
 package uk.ac.stir.cs.yh.cs.database;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
@@ -8,6 +11,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 /**
  * This class represents a Unit to be converted between.
  * This class references a foreign key in the Conversion class.
@@ -15,7 +20,7 @@ import androidx.room.PrimaryKey;
  */
 @Entity(indices = {@Index("id")},
         foreignKeys = @ForeignKey(entity = Category.class, parentColumns = "id", childColumns = "category_id"))
-public class Unit {
+public class Unit implements Serializable {
 
     Unit(String unitName, String unitSuffix, int categoryId) {
         this.unitName = unitName;

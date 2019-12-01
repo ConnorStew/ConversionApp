@@ -28,14 +28,14 @@
             android:layout_height="match_parent" >
 
             <TextView
-                android:id="@+id/fromText"
+                android:id="@+id/fromUnitText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
                 android:text="@string/from" />
 
             <TextView
-                android:id="@+id/toText"
+                android:id="@+id/toUnitText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
@@ -65,7 +65,7 @@
             >
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/btnConvert"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/convert"
