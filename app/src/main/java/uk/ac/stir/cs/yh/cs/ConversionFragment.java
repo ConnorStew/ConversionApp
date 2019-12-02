@@ -24,6 +24,8 @@ import uk.ac.stir.cs.yh.cs.database.Unit;
  */
 public class ConversionFragment extends Fragment {
 
+
+
     /** The unit to convert from. */
     private Unit fromUnit;
 
@@ -36,12 +38,15 @@ public class ConversionFragment extends Fragment {
 
     private Context context;
 
+    static final String FROM_KEY = "fromUnit";
+    static final String TO_KEY = "toUnit";
+
     @Override
     public void setArguments(@Nullable Bundle args) {
         super.setArguments(args);
         if (args != null) {
-            this.fromUnit = (Unit) args.get("fromUnit");
-            this.toUnit = (Unit) args.get("toUnit");
+            this.fromUnit = (Unit) args.get(FROM_KEY);
+            this.toUnit = (Unit) args.get(TO_KEY);
         }
     }
 
@@ -59,20 +64,33 @@ public class ConversionFragment extends Fragment {
         toText.setText(toUnit.unitName);
 
         view.findViewById(R.id.btnCalc).setOnClickListener(this::calculate);
+        view.findViewById(R.id.btnClear).setOnClickListener(this::clear);
 
         return view;
     }
 
     @SuppressLint("SetTextI18n")
     private void calculate(View view) {
-
         Conversion conversion = Database.getDB().conversionDao().getConversion(fromUnit.id, toUnit.id);
         if (conversion == null)
             Toast.makeText(context, "Can't find conversion!", Toast.LENGTH_LONG).show();
         else {
+            if (fromInput.getText() == null || fromInput.getText().toString().equals("")) {
+                Toast.makeText(context, "Please input a value to convert.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
             double userInput = Double.parseDouble(fromInput.getText().toString());
             double calculatedAmount = userInput * conversion.conversionFactor;
             resultText.setText(Double.toString(calculatedAmount));
         }
+    }
+
+    private void clear(View view) {
+        resultText.setText("");
+        resultText.clearFocus();
+
+        fromInput.setText("");
+        fromInput.clearFocus();
     }
 }

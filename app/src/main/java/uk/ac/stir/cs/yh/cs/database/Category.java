@@ -1,10 +1,13 @@
 package uk.ac.stir.cs.yh.cs.database;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
+
+import java.io.Serializable;
 
 /**
  * This class represents a category of conversion.<br>
@@ -12,7 +15,7 @@ import androidx.room.PrimaryKey;
  * @author Connor Stewart
  */
 @Entity(indices = {@Index("id"), @Index(value = "category_name", unique = true)})
-public class Category {
+public class Category implements Serializable {
 
     /**
      * Creates a new category with a given name.
@@ -34,5 +37,19 @@ public class Category {
     @NonNull
     public String toString() {
         return categoryName;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        boolean equal = false;
+        if (obj instanceof Category) {
+            Category otherCategory = (Category) obj;
+
+            if (otherCategory.categoryName.equals(this.categoryName)) {
+                equal = true;
+            }
+        }
+
+        return equal;
     }
 }

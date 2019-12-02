@@ -20,9 +20,10 @@
                 android:id="@+id/fromInput"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_span="2"
                 android:hint="@string/from_desc"
                 android:importantForAutofill="no"
-                android:inputType="number"
+                android:inputType="numberDecimal"
                 android:textAlignment="center" />
 
         </TableRow>
@@ -47,6 +48,7 @@
                 android:textAppearance="?android:attr/textAppearanceMediumInverse"
                 android:textAlignment="center"
                 android:textIsSelectable="true"
+                android:layout_span="2"
                 />
 
         </TableRow>
@@ -60,7 +62,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_span="2"
-                android:text="@string/calc" />
+                android:text="@string/calc"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btnClear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/clear"
+                tools:ignore="ButtonStyle" />
 
         </TableRow>
 

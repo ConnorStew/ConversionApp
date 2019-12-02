@@ -1,8 +1,6 @@
 package uk.ac.stir.cs.yh.cs;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,40 +12,145 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import uk.ac.stir.cs.yh.cs.database.Category;
 import uk.ac.stir.cs.yh.cs.database.Database;
 import uk.ac.stir.cs.yh.cs.database.Unit;
 
+/**
+ * This fragment allows the user to select a category and units to convert between.
+ * @author Connor Stewart
+ */
 public class PickerFragment extends Fragment {
 
+    /** Allows the user to select a category. */
     private Spinner categorySpinner;
+
+    /** Allows the user to select the unit to convert from. */
     private Spinner fromSpinner;
+
+    /** Allows the user to select the unit to convert to. */
     private Spinner toSpinner;
+
+    /** Stores categories being shown in the categorySpinner. */
+    private ArrayAdapter<Category> categoryArrayAdapter;
+
+    /** Stores units being shown in the toSpinner. */
+    private ArrayAdapter<Unit> toUnitArrayAdapter;
+
+    /** Stores units being shown in the fromSpinner. */
+    private ArrayAdapter<Unit> fromUnitArrayAdapter;
+
+    /** The last category selected by the user. */
+    private Category lastSelectedCategory = null;
+
+    /** Whether the initial data has been inserted into the spinners. */
+    private boolean initialised = false;
+
+    /** The saved instance state. */
+    private Bundle savedInstanceState;
+
+    //keys for storing data
+
+    /** The key for storing the selected category. */
+    private static final String CATEGORY_KEY = "selectedCategory";
+
+    /** The key for storing the selected from unit. */
+    private static final String FROM_UNIT_KEY = "fromUnit";
+
+    /** The key for storing the selected to unit. */
+    private static final String TO_UNIT_KEY = "toUnit";
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        //initialise array adapters for storing data while in another fragment
+
+        categoryArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item);
+        categoryArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        fromUnitArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item);
+        fromUnitArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        toUnitArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item);
+        toUnitArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    }
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        List<Category> categories = new ArrayList<>(Database.getDB().categoryDao().getAll());
+        this.savedInstanceState = savedInstanceState;
 
-        final Context context = getContext();
-
+        //initialise UI
         View view = inflater.inflate(R.layout.activity_picker, container, false);
-        categorySpinner = view.findViewById(R.id.categorySpinner);
-        fromSpinner = view.findViewById(R.id.fromSpinner);
-        toSpinner = view.findViewById(R.id.toSpinner);
-        final Button btnConvert = view.findViewById(R.id.btnConvert);
 
-        setSpinnerItems(categorySpinner, categories, context);
+        initialiseSpinners(view);
+        initialiseEvents(view);
+
+        //set all data in spinners to default if they haven't been initialised yet
+        if (!initialised) {
+            List<Category> categories = Database.getDB().categoryDao().getAll();
+
+            categoryArrayAdapter.clear();
+            categoryArrayAdapter.addAll(categories);
+            categorySpinner.setSelection(0);
+
+            List<Unit> units = Database.getDB().unitDao().getUnitsByCategory(categories.get(0).id);
+            fromUnitArrayAdapter.clear();
+            fromUnitArrayAdapter.addAll(units);
+            fromSpinner.setSelection(0);
+
+            units.remove(0);
+            toUnitArrayAdapter.clear();
+            toUnitArrayAdapter.addAll(units);
+            toSpinner.setSelection(0);
+
+            initialised = true;
+        }
+
+        //if returning from a saved state, set category selected to the saved category
+        if (savedInstanceState != null) {
+            Category selectedCategory = (Category) savedInstanceState.getSerializable(CATEGORY_KEY);
+
+            int position = categoryArrayAdapter.getPosition(selectedCategory);
+            categorySpinner.setSelection(position);
+            updateFromSpinner(); //set other events off
+        }
+
+        return view;
+    }
+
+    /**
+     * Initialises the spinners references and sets their adapters.
+     * @param view the view containing the spinners
+     */
+    private void initialiseSpinners(View view) {
+        categorySpinner = view.findViewById(R.id.categorySpinner);
+        categorySpinner.setAdapter(categoryArrayAdapter);
+
+        fromSpinner = view.findViewById(R.id.fromSpinner);
+        fromSpinner.setAdapter(fromUnitArrayAdapter);
+
+        toSpinner = view.findViewById(R.id.toSpinner);
+        toSpinner.setAdapter(toUnitArrayAdapter);
+    }
+
+    /**
+     * Initialises the events that trigger when the user selects a category or from unit.
+     * @param view the view containing the spinner
+     */
+    private void initialiseEvents(View view) {
+        final Button btnConvert = view.findViewById(R.id.btnConvert);
+        btnConvert.setOnClickListener((v) -> goToConversionFragment());
 
         fromSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                fromUnitSelected(context);
+                updateToSpinner();
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
@@ -56,60 +159,86 @@ public class PickerFragment extends Fragment {
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                categorySelected(context);
+                Category current = (Category) categorySpinner.getSelectedItem();
+
+                if (!current.equals(lastSelectedCategory)) {
+                    updateFromSpinner();
+                    lastSelectedCategory = current;
+                }
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
-
-        btnConvert.setOnClickListener(this::btnConvertClicked);
-
-        return view;
     }
 
-    private void btnConvertClicked(View view) {
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        //save all items selected in the spinners
+        outState.putSerializable(CATEGORY_KEY, (Category) categorySpinner.getSelectedItem());
+        outState.putSerializable(FROM_UNIT_KEY, (Unit) fromSpinner.getSelectedItem());
+        outState.putSerializable(TO_UNIT_KEY, (Unit) toSpinner.getSelectedItem());
+
+        super.onSaveInstanceState(outState);
+    }
+
+    /**
+     * Replaces this fragment with a conversion fragment, sending thew two select units in a bundle.
+     */
+    private void goToConversionFragment() {
         ConversionFragment newFragment = new ConversionFragment();
 
         Bundle argBundle = new Bundle();
-        argBundle.putSerializable("fromUnit", (Unit) fromSpinner.getSelectedItem());
-        argBundle.putSerializable("toUnit", (Unit) toSpinner.getSelectedItem());
+        argBundle.putSerializable(ConversionFragment.FROM_KEY, (Unit) fromSpinner.getSelectedItem());
+        argBundle.putSerializable(ConversionFragment.TO_KEY, (Unit) toSpinner.getSelectedItem());
 
         newFragment.setArguments(argBundle);
 
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, newFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        getFragmentManager().beginTransaction().replace(R.id.fragment_container, newFragment).addToBackStack(null).commit();
     }
 
-    private void categorySelected(Context context) {
-        Log.d("Click", "category selected");
-        setSpinnerItems(fromSpinner, getUnitsFromSelectedCategory(), context);
+    /**
+     * Updates the items in the from spinner based on the selected category.
+     * If there is a saved instance it will select the unit that was selected in the last instance.
+     */
+    private void updateFromSpinner() {
+        fromUnitArrayAdapter.clear();
+        fromUnitArrayAdapter.addAll(getUnitsFromSelectedCategory());
+        fromSpinner.setSelection(0);
+
+        if (savedInstanceState != null) {
+            Unit fromUnit = (Unit) savedInstanceState.getSerializable(FROM_UNIT_KEY);
+            int position = fromUnitArrayAdapter.getPosition(fromUnit);
+            fromSpinner.setSelection(position);
+        }
+
+        updateToSpinner();
     }
 
-    private void fromUnitSelected(Context context) {
-        Log.d("Click", "from spinner selected");
+    /**
+     * Updates the units in the to spinner based on what is selected in the from spinner.
+     * If there is a saved instance it will select the unit that was selected in the last instance.
+     */
+    private void updateToSpinner() {
         Unit fromSelected = (Unit) fromSpinner.getSelectedItem();
         List<Unit> units = getUnitsFromSelectedCategory();
         units.remove(fromSelected);
-        setSpinnerItems(toSpinner, units, context);
+
+        toUnitArrayAdapter.clear();
+        toUnitArrayAdapter.addAll(units);
+
+        if (savedInstanceState != null) {
+            Unit toUnit = (Unit) savedInstanceState.getSerializable(TO_UNIT_KEY);
+            int position = toUnitArrayAdapter.getPosition(toUnit);
+            toSpinner.setSelection(position);
+        }
     }
 
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
+    /**
+     * Gets a list of units given the category selected in the category spinner.
+     * @return a list of relevant units
+     */
     private List<Unit> getUnitsFromSelectedCategory() {
         Category selectedCategory = (Category) categorySpinner.getSelectedItem();
         return Database.getDB().unitDao().getUnitsByCategory(selectedCategory.id);
-    }
-
-    private void setSpinnerItems(Spinner spinner, List<?> values, Context context) {
-        ArrayAdapter<?> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, values);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinner.setAdapter(adapter);
     }
 }
