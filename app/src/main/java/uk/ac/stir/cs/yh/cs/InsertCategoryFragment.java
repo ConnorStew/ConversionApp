@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,7 +37,13 @@ public class InsertCategoryFragment extends Fragment {
      */
     private void insertCategory() {
         String categoryName = categoryEditText.getText().toString();
-        Database.getDB().categoryDao().insertAll(new Category(categoryName));
+
+        if (Database.getDB().categoryDao().getCategoryByName(categoryName) != null) {
+            Toast.makeText(getContext(), "Category already exists.", Toast.LENGTH_LONG).show();
+        } else {
+            Database.getDB().categoryDao().insertAll(new Category(categoryName));
+        }
+
         getActivity().onBackPressed();
     }
 }

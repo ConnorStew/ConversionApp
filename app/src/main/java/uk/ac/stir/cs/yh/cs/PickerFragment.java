@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import uk.ac.stir.cs.yh.cs.database.Category;
@@ -98,15 +99,19 @@ public class PickerFragment extends Fragment {
 
         categoryArrayAdapter.clear();
         categoryArrayAdapter.addAll(categories);
+        updateFromSpinner();
 
-
-        List<Unit> units = Database.getDB().unitDao().getUnitsByCategory(categories.get(0).id);
-        fromUnitArrayAdapter.clear();
-        fromUnitArrayAdapter.addAll(units);
-
-        units.remove(0);
-        toUnitArrayAdapter.clear();
-        toUnitArrayAdapter.addAll(units);
+//        int selectedCategoryPosition = categorySpinner.getSelectedItemPosition();
+//        if (selectedCategoryPosition == -1)
+//            selectedCategoryPosition = 0;
+//
+//        List<Unit> units = Database.getDB().unitDao().getUnitsByCategory(categories.get(selectedCategoryPosition).id);
+//        fromUnitArrayAdapter.clear();
+//        fromUnitArrayAdapter.addAll(units);
+//
+//        units.remove(0);
+//        toUnitArrayAdapter.clear();
+//        toUnitArrayAdapter.addAll(units);
 
         if (!initialised) {
             categorySpinner.setSelection(0);
@@ -166,11 +171,11 @@ public class PickerFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Category current = (Category) categorySpinner.getSelectedItem();
-
-                if (!current.equals(lastSelectedCategory)) {
-                    updateFromSpinner();
-                    lastSelectedCategory = current;
-                }
+                updateFromSpinner();
+//                if (!current.equals(lastSelectedCategory)) {
+//
+//                    lastSelectedCategory = current;
+//                }
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
@@ -194,8 +199,8 @@ public class PickerFragment extends Fragment {
         Unit fromUnit = (Unit) fromSpinner.getSelectedItem();
         Unit toUnit = (Unit) toSpinner.getSelectedItem();
 
-        if (fromUnit == null && toUnit == null) {
-            Toast.makeText(getContext(), "No units to convert!", Toast.LENGTH_LONG).show();
+        if (fromUnit == null || toUnit == null) {
+            Toast.makeText(getContext(), "Invalid units", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -263,11 +268,16 @@ public class PickerFragment extends Fragment {
      */
     private void updateToSpinner() {
         Unit fromSelected = (Unit) fromSpinner.getSelectedItem();
-        List<Unit> units = getUnitsFromSelectedCategory();
-        units.remove(fromSelected);
+
+        List<Unit> units = new ArrayList<>();
+        if (fromSelected != null) {
+            units = getUnitsFromSelectedCategory();
+            units.remove(fromSelected);
+        }
 
         toUnitArrayAdapter.clear();
         toUnitArrayAdapter.addAll(units);
+        toSpinner.setSelection(0);
 
         if (savedInstanceState != null) {
             Unit toUnit = (Unit) savedInstanceState.getSerializable(TO_UNIT_KEY);
@@ -282,6 +292,11 @@ public class PickerFragment extends Fragment {
      */
     private List<Unit> getUnitsFromSelectedCategory() {
         Category selectedCategory = (Category) categorySpinner.getSelectedItem();
+
+        if (selectedCategory == null) {
+            selectedCategory = Database.getDB().categoryDao().getAll().get(0);
+        }
+
         return Database.getDB().unitDao().getUnitsByCategory(selectedCategory.id);
     }
 }

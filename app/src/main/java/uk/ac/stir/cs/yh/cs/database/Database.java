@@ -36,34 +36,37 @@ public class Database {
         return db;
     }
 
-    /** Inserts test data into the database. */
+    /**
+     * Inserts test data into the database.
+     * Will only insert test data if the Kilogram unit isn't present.
+     */
     private static void initTestData() {
-        db.clearAllTables();
+        if (db.unitDao().getUnitByName("Kilogram") == null) {
+            db.categoryDao().insertAll(
+                    new Category("Weight"),
+                    new Category("Liquid")
+            );
 
-        db.categoryDao().insertAll(
-                new Category("Weight"),
-                new Category("Liquid")
-        );
+            int weightID = db.categoryDao().getCategoryByName("Weight").id;
+            int liquidID = db.categoryDao().getCategoryByName("Liquid").id;
+            db.unitDao().insertAll(
+                    new Unit("Kilogram", "kg", weightID),
+                    new Unit("Pound", "lb", weightID),
+                    new Unit("Gallon", "gallon", liquidID),
+                    new Unit("Pint", "pint", liquidID),
+                    new Unit("Quart", "quart", liquidID)
+            );
 
-        int weightID = db.categoryDao().getCategoryByName("Weight").id;
-        int liquidID = db.categoryDao().getCategoryByName("Liquid").id;
-        db.unitDao().insertAll(
-                new Unit("Kilogram", "kg", weightID),
-                new Unit("Pound", "lb", weightID),
-                new Unit("Gallon", "gallon", liquidID),
-                new Unit("Pint", "pint", liquidID),
-                new Unit("Quart", "quart", liquidID)
-        );
-
-        int kilogramID = db.unitDao().getUnitByName("Kilogram").id;
-        int poundID = db.unitDao().getUnitByName("Pound").id;
-        int gallonID = db.unitDao().getUnitByName("Gallon").id;
-        int pintID = db.unitDao().getUnitByName("Pint").id;
-        int quartID = db.unitDao().getUnitByName("Quart").id;
-        db.conversionDao().insertAll(
-                new Conversion(kilogramID, poundID, 2.2),
-                new Conversion(gallonID, pintID, 8),
-                new Conversion(gallonID, quartID, 4)
-        );
+            int kilogramID = db.unitDao().getUnitByName("Kilogram").id;
+            int poundID = db.unitDao().getUnitByName("Pound").id;
+            int gallonID = db.unitDao().getUnitByName("Gallon").id;
+            int pintID = db.unitDao().getUnitByName("Pint").id;
+            int quartID = db.unitDao().getUnitByName("Quart").id;
+            db.conversionDao().insertAll(
+                    new Conversion(kilogramID, poundID, 2.2),
+                    new Conversion(gallonID, pintID, 8),
+                    new Conversion(gallonID, quartID, 4)
+            );
+        }
     }
 }

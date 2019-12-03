@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -51,7 +52,12 @@ public class InsertUnitFragment extends Fragment {
         String unitSuffix = unitSuffixEditText.getText().toString();
 
         Category selectedCategory = (Category) categorySpinner.getSelectedItem();
-        Database.getDB().unitDao().insertAll(new Unit(unitName, unitSuffix, selectedCategory.id));
+
+        if (Database.getDB().unitDao().getUnitByName(unitName) != null) {
+            Toast.makeText(getContext(), "Unit already exists.", Toast.LENGTH_LONG).show();
+        } else {
+            Database.getDB().unitDao().insertAll(new Unit(unitName, unitSuffix, selectedCategory.id));
+        }
 
         getActivity().onBackPressed();
     }
