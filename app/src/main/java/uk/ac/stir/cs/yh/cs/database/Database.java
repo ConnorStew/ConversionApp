@@ -24,7 +24,7 @@ public class Database {
      */
     public static void initDB(Context context) {
         if (!initialised) {
-            db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).allowMainThreadQueries().build();
+            db = Room.databaseBuilder(context, AppDatabase.class, "unit-conversion-db").allowMainThreadQueries().build();
             initTestData();
 
             initialised = true;
