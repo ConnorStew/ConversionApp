@@ -22,7 +22,7 @@ import java.io.Serializable;
         foreignKeys = @ForeignKey(entity = Category.class, parentColumns = "id", childColumns = "category_id"))
 public class Unit implements Serializable {
 
-    Unit(String unitName, String unitSuffix, int categoryId) {
+    public Unit(String unitName, String unitSuffix, int categoryId) {
         this.unitName = unitName;
         this.unitSuffix = unitSuffix;
         this.categoryId = categoryId;

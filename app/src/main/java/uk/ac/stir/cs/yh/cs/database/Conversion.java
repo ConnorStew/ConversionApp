@@ -13,7 +13,7 @@ import androidx.room.PrimaryKey;
 @Entity(primaryKeys = {"unit_1_id", "unit_2_id"})
 public class Conversion {
 
-    Conversion(int unit1Id, int unit2Id, double conversionFactor) {
+    public Conversion(int unit1Id, int unit2Id, double conversionFactor) {
         this.unit1Id = unit1Id;
         this.unit2Id = unit2Id;
         this.conversionFactor = conversionFactor;

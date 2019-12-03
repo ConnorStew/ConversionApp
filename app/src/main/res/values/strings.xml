@@ -11,4 +11,10 @@
     <string name="insert_button">Insert</string>
     <string name="category_name">Category Name</string>
     <string name="empty_string" />
+    <string name="unit_name">Unit Name</string>
+    <string name="category">Category</string>
+    <string name="unit_suffix">Unit Suffix</string>
+    <string name="unit_1">Unit 1</string>
+    <string name="unit_2">Unit 2</string>
+    <string name="conversion_factor">Conversion Factor</string>
 </resources>
