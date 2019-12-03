@@ -13,6 +13,8 @@ public class Database {
     /** The instance of the Room database. */
     private static AppDatabase db;
 
+    private static boolean initialised = false;
+
     /** Singleton class to the constructor is private. */
     private Database() {}
 
@@ -21,8 +23,12 @@ public class Database {
      * @param context the applications context
      */
     public static void initDB(Context context) {
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).allowMainThreadQueries().build();
-        initTestData();
+        if (!initialised) {
+            db = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).allowMainThreadQueries().build();
+            initTestData();
+
+            initialised = true;
+        }
     }
 
     /** @return the Room database */

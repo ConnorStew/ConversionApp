@@ -21,7 +21,7 @@ public class Category implements Serializable {
      * Creates a new category with a given name.
      * @param categoryName the name of this category
      */
-    Category(String categoryName) {
+    public Category(String categoryName) {
         this.categoryName = categoryName;
     }
 

@@ -6,4 +6,9 @@
     <string name="to">To</string>
     <string name="from_desc">The value to convert.</string>
     <string name="clear">Clear</string>
+    <string name="insert">Insert New Data</string>
+    <string name="insert_type">Insert Type</string>
+    <string name="insert_button">Insert</string>
+    <string name="category_name">Category Name</string>
+    <string name="empty_string" />
 </resources>

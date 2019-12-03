@@ -1,5 +1,6 @@
 package uk.ac.stir.cs.yh.cs;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,9 +9,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import java.util.List;
@@ -66,6 +69,7 @@ public class PickerFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Database.initDB(getContext());
 
         //initialise array adapters for storing data while in another fragment
 
@@ -79,8 +83,6 @@ public class PickerFragment extends Fragment {
         toUnitArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     }
 
-
-    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         this.savedInstanceState = savedInstanceState;
@@ -92,23 +94,24 @@ public class PickerFragment extends Fragment {
         initialiseEvents(view);
 
         //set all data in spinners to default if they haven't been initialised yet
+        List<Category> categories = Database.getDB().categoryDao().getAll();
+
+        categoryArrayAdapter.clear();
+        categoryArrayAdapter.addAll(categories);
+
+
+        List<Unit> units = Database.getDB().unitDao().getUnitsByCategory(categories.get(0).id);
+        fromUnitArrayAdapter.clear();
+        fromUnitArrayAdapter.addAll(units);
+
+        units.remove(0);
+        toUnitArrayAdapter.clear();
+        toUnitArrayAdapter.addAll(units);
+
         if (!initialised) {
-            List<Category> categories = Database.getDB().categoryDao().getAll();
-
-            categoryArrayAdapter.clear();
-            categoryArrayAdapter.addAll(categories);
             categorySpinner.setSelection(0);
-
-            List<Unit> units = Database.getDB().unitDao().getUnitsByCategory(categories.get(0).id);
-            fromUnitArrayAdapter.clear();
-            fromUnitArrayAdapter.addAll(units);
             fromSpinner.setSelection(0);
-
-            units.remove(0);
-            toUnitArrayAdapter.clear();
-            toUnitArrayAdapter.addAll(units);
             toSpinner.setSelection(0);
-
             initialised = true;
         }
 
@@ -147,6 +150,9 @@ public class PickerFragment extends Fragment {
         final Button btnConvert = view.findViewById(R.id.btnConvert);
         btnConvert.setOnClickListener((v) -> goToConversionFragment());
 
+        final Button btnInsert = view.findViewById(R.id.btnInsert);
+        btnInsert.setOnClickListener((v) -> goToInsertFragment());
+
         fromSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -182,18 +188,55 @@ public class PickerFragment extends Fragment {
     }
 
     /**
-     * Replaces this fragment with a conversion fragment, sending thew two select units in a bundle.
+     * Replaces this fragment with a conversion fragment, sending the two select units in a bundle.
      */
     private void goToConversionFragment() {
+        Unit fromUnit = (Unit) fromSpinner.getSelectedItem();
+        Unit toUnit = (Unit) toSpinner.getSelectedItem();
+
+        if (fromUnit == null && toUnit == null) {
+            Toast.makeText(getContext(), "No units to convert!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         ConversionFragment newFragment = new ConversionFragment();
 
         Bundle argBundle = new Bundle();
-        argBundle.putSerializable(ConversionFragment.FROM_KEY, (Unit) fromSpinner.getSelectedItem());
-        argBundle.putSerializable(ConversionFragment.TO_KEY, (Unit) toSpinner.getSelectedItem());
+        argBundle.putSerializable(ConversionFragment.FROM_KEY, fromUnit);
+        argBundle.putSerializable(ConversionFragment.TO_KEY, toUnit);
 
         newFragment.setArguments(argBundle);
 
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, newFragment).addToBackStack(null).commit();
+    }
+
+    /**
+     * Replaces this fragment with the a fragment depending on the user choice.
+     */
+    private void goToInsertFragment() {
+        String[] options = {"Category", "Unit", "Conversion"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("What kind of data would you like to insert?");
+
+        builder.setItems(options, (dialog, selection) -> {
+            Fragment fragment = null;
+            switch (selection) {
+                case 0:
+                    fragment = new InsertCategoryFragment();
+                    break;
+                case 1:
+                    fragment = new InsertUnitFragment();
+                    break;
+                case 2:
+                    fragment = new InsertConversionFragment();
+                    break;
+            }
+
+            getFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).addToBackStack(null).commit();
+        });
+
+        builder.show();
     }
 
     /**

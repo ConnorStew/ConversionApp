@@ -6,11 +6,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/btnInsert"
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:text="@string/insert"
+        app:layout_constraintBottom_toBottomOf="@+id/tableLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <TableLayout
+        android:id="@+id/tableLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:stretchColumns="*"
-        >
+        android:stretchColumns="*">
 
         <TableRow
             android:layout_width="fill_parent"
@@ -18,39 +27,38 @@
 
             <Spinner
                 android:id="@+id/categorySpinner"
-                android:layout_span="2"
                 android:layout_margin="10dp"
-                />
+                android:layout_span="2" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/fromUnitText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="@string/from" />
+                android:text="@string/from"
+                android:textAlignment="center" />
 
             <TextView
                 android:id="@+id/toUnitText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="@string/to" />
+                android:text="@string/to"
+                android:textAlignment="center" />
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
             <Spinner
                 android:id="@+id/fromSpinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"/>
+                android:layout_margin="10dp" />
 
             <Spinner
                 android:id="@+id/toSpinner"
@@ -61,16 +69,15 @@
 
         <TableRow
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            >
+            android:layout_height="fill_parent">
 
             <Button
                 android:id="@+id/btnConvert"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/convert"
                 android:layout_span="2"
-                />
+                android:text="@string/convert" />
+
         </TableRow>
 
     </TableLayout>

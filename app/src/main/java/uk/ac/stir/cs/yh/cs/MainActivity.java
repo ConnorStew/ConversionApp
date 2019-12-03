@@ -2,50 +2,31 @@ package uk.ac.stir.cs.yh.cs;
 
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import uk.ac.stir.cs.yh.cs.database.Database;
 
+/**
+ * This activity hosts fragments used by the Application.
+ * @author Connor Stewart
+ */
 public class MainActivity extends AppCompatActivity {
-
-    private PickerFragment pickerFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.d("Connor", "ON CREATE FOR ACTIVITY!");
-
-        Database.initDB(this);
-
         setContentView(R.layout.activity_main);
 
-        pickerFragment = new PickerFragment();
-        if (savedInstanceState != null) {
-            Fragment savedFragment = getSupportFragmentManager().getFragment(savedInstanceState, "picker");
-            if (savedFragment != null)
-                pickerFragment = (PickerFragment) savedFragment;
-        } else {
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, pickerFragment).addToBackStack(null).commit();
-        }
-
-
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        getSupportFragmentManager().putFragment(outState, "picker", pickerFragment);
-        Log.d("Connor", "Saved picker fragment");
-        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, new PickerFragment()).addToBackStack(null).commit();
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (getSupportFragmentManager().getFragments().get(0) instanceof PickerFragment) {
+            finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
