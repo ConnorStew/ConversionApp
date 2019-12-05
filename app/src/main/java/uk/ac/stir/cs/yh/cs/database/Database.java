@@ -65,7 +65,8 @@ public class Database {
             db.conversionDao().insertAll(
                     new Conversion(kilogramID, poundID, 2.2),
                     new Conversion(gallonID, pintID, 8),
-                    new Conversion(gallonID, quartID, 4)
+                    new Conversion(gallonID, quartID, 4),
+                    new Conversion(quartID, pintID, 2)
             );
         }
     }

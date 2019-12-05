@@ -1,77 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:stretchColumns="*">
 
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+    <TableRow
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
-            <TextView
-                android:id="@+id/fromUnitText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="center" />
+        <TextView
+            android:id="@+id/fromUnitText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center" />
 
-            <EditText
-                android:id="@+id/fromInput"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_span="2"
-                android:hint="@string/from_desc"
-                android:importantForAutofill="no"
-                android:inputType="numberDecimal"
-                android:textAlignment="center" />
+        <EditText
+            android:id="@+id/fromInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_span="2"
+            android:hint="@string/from_desc"
+            android:importantForAutofill="no"
+            android:inputType="numberDecimal"
+            android:textAlignment="center" />
 
-        </TableRow>
+    </TableRow>
 
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
+    <TableRow
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
-            <TextView
-                android:id="@+id/toUnitText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="center" />
+        <TextView
+            android:id="@+id/toUnitText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center" />
 
-            <TextView
-                android:id="@+id/txtResult"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?attr/editTextColor"
-                android:background="?attr/editTextBackground"
-                android:gravity="center_vertical"
-                android:textAppearance="?android:attr/textAppearanceMediumInverse"
-                android:textAlignment="center"
-                android:textIsSelectable="true"
-                android:layout_span="2"
-                />
+        <TextView
+            android:id="@+id/txtResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_span="2"
+            android:background="?attr/editTextBackground"
+            android:gravity="center_vertical"
+            android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceMediumInverse"
+            android:textColor="?attr/editTextColor"
+            android:textIsSelectable="true" />
 
-        </TableRow>
+    </TableRow>
 
-        <TableRow
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/btnCalc"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_span="2"
+            android:text="@string/calc"
+            tools:ignore="ButtonStyle" />
 
-            <Button
-                android:id="@+id/btnCalc"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_span="2"
-                android:text="@string/calc"
-                tools:ignore="ButtonStyle" />
+        <Button
+            android:id="@+id/btnClear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear"
+            tools:ignore="ButtonStyle" />
 
-            <Button
-                android:id="@+id/btnClear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/clear"
-                tools:ignore="ButtonStyle" />
-
-        </TableRow>
+    </TableRow>
 
 </TableLayout>
